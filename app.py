@@ -12,7 +12,13 @@ from youtubesearchpython import VideosSearch
 app = Flask(__name__)
 app.secret_key = 'descarga-audio'
 
-RUTA_DESCARGA = 'descargar'
+
+# Usar /tmp en Vercel para archivos temporales
+import platform
+if 'vercel' in os.environ.get('PATH', '').lower() or platform.system() == 'Linux':
+    RUTA_DESCARGA = '/tmp/descargar'
+else:
+    RUTA_DESCARGA = 'descargar'
 
 if not os.path.exists(RUTA_DESCARGA):
     os.makedirs(RUTA_DESCARGA)
