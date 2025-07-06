@@ -8,7 +8,6 @@ from youtubesearchpython import VideosSearch
 app = Flask(__name__)
 app.secret_key = 'descarga-audio'
 
-
 import platform
 if 'vercel' in os.environ.get('PATH', '').lower() or platform.system() == 'Linux':
     RUTA_DESCARGA = '/tmp/descargar'
@@ -18,18 +17,15 @@ else:
 if not os.path.exists(RUTA_DESCARGA):
     os.makedirs(RUTA_DESCARGA)
 
-
 import re
 from datetime import datetime
 
 def limpiar_url_youtube(url):
-    """Limpia parámetros de playlist y otros extras de la URL de YouTube."""
     url = re.sub(r'([&?](list|index|start_radio|t|ab_channel|pp)=.*?)(?=&|$)', '', url)
     url = re.sub(r'[&?]+$', '', url)
     return url
 
 def descargar_audio(url, progress_hook=None):
-    # Extraer metadatos para obtener el artista
     info = None
     with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
         try:
@@ -39,19 +35,15 @@ def descargar_audio(url, progress_hook=None):
     artista_abrev = 'Desconocido'
     if info:
         import re
-        # 1. Si hay artist, usarlo
         artista = info.get('artist')
         if artista:
             pass
         else:
-            # 2. Si no, intentar extraer antes del primer guion del título
             titulo = info.get('title', '')
             if '-' in titulo:
                 artista = titulo.split('-')[0].strip()
             else:
-                # 3. Si no, usar uploader
                 artista = info.get('uploader', 'Desconocido')
-        # Limpiar y abreviar
         artista = artista.lower()
         artista = re.sub(r'[áàäâ]', 'a', artista)
         artista = re.sub(r'[éèëê]', 'e', artista)
@@ -85,7 +77,6 @@ def descargar_audio(url, progress_hook=None):
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    # Actualiza la fecha de creación del archivo mp3 a ahora
     for root, dirs, files in os.walk(RUTA_DESCARGA):
         for f in files:
             if f.endswith('.mp3'):
@@ -93,10 +84,9 @@ def descargar_audio(url, progress_hook=None):
                 os.utime(ruta, (time.time(), time.time()))
 
 def obtener_archivos_descargados():
-    """Obtiene la lista de archivos mp3 válidos y elimina los expirados. Agrupa por artista/carpeta."""
     archivos = []
     ahora = time.time()
-    LIMITE_SEGUNDOS = 24*60*60  # 1 día
+    LIMITE_SEGUNDOS = 24*60*60
     if os.path.exists(RUTA_DESCARGA):
         for root, dirs, files in os.walk(RUTA_DESCARGA):
             for f in files:
@@ -110,7 +100,6 @@ def obtener_archivos_descargados():
                     if tiempo_restante <= 0:
                         os.remove(ruta)
                     else:
-                        # Mostrar ruta relativa desde RUTA_DESCARGA
                         rel_path = os.path.relpath(ruta, RUTA_DESCARGA)
                         archivos.append({'nombre': rel_path, 'tiempo_restante': tiempo_restante})
     return archivos
@@ -123,9 +112,7 @@ def actualizar_progreso(d, progress_data):
         progress_data['progress'] = 100
         progress_data['status'] = 'converting'
 
-
 progress_data = {'progress': 0, 'status': 'idle'}
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -147,17 +134,14 @@ def index():
     archivos = obtener_archivos_descargados()
     return render_template('index.html', archivos=archivos, now=datetime.now)
 
-# Endpoint para consultar el progreso
 @app.route('/progreso')
 def progreso():
     return jsonify(progress_data)
-
 
 from urllib.parse import unquote
 
 @app.route('/descargar/<path:nombre_archivo>')
 def descargar_archivo(nombre_archivo):
-    # nombre_archivo puede ser "artista/cancion.mp3"
     nombre_archivo = unquote(nombre_archivo)
     ruta = os.path.join(RUTA_DESCARGA, nombre_archivo)
     if os.path.exists(ruta):

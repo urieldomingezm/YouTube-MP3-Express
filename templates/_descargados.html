@@ -1,42 +1,48 @@
 <section class="card" style="margin-top: 2.5rem; padding: 2rem;">
     <h2 style="color: #0ea5e9; margin-bottom: 1em; text-align: center; display: flex; align-items: center; gap: 0.5em;">
-        <i class="bi bi-music-note-list"></i> Audios descargados</h2>
+        <i class="bi bi-music-note-list"></i> Audios descargados
+    </h2>
     {% if archivos %}
     <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 1em;">
         {% for archivo in archivos %}
-        <li style="display: flex; align-items: center; justify-content: space-between; background: var(--tw-card-bg, #f3f4f6); border-radius: 8px; padding: 0.7em 1em; gap: 0.5em; flex-wrap: wrap;">
-            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45vw; display: flex; align-items: center; gap: 0.5em;">
+        <li
+            style="display: flex; align-items: center; justify-content: space-between; background: var(--tw-card-bg, #f3f4f6); border-radius: 8px; padding: 0.7em 1em; gap: 0.5em; flex-wrap: wrap;">
+            <span
+                style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 45vw; display: flex; align-items: center; gap: 0.5em;">
                 <i class="bi bi-music-note"></i> {{ archivo.nombre }}
             </span>
             <span style="font-size: 0.95em; color: #0ea5e9; display: flex; align-items: center; gap: 0.3em;">
                 <i class="bi bi-clock-history"></i>
-                <span id="timer-{{ loop.index0 }}">{{ archivo.tiempo_restante // 3600 }}h {{ (archivo.tiempo_restante // 60) % 60 }}m {{ archivo.tiempo_restante % 60 }}s</span>
+                <span id="timer-{{ loop.index0 }}">{{ archivo.tiempo_restante // 3600 }}h {{ (archivo.tiempo_restante //
+                    60) % 60 }}m {{ archivo.tiempo_restante % 60 }}s</span>
             </span>
-            <a href="{{ url_for('descargar_archivo', nombre_archivo=archivo.nombre) }}" class="btn-primary" download style="font-size: 1rem; padding: 0.5em 1.2em; display: flex; align-items: center; gap: 0.5em;"><i class="bi bi-download"></i> Descargar</a>
+            <a href="{{ url_for('descargar_archivo', nombre_archivo=archivo.nombre) }}" class="btn-primary" download
+                style="font-size: 1rem; padding: 0.5em 1.2em; display: flex; align-items: center; gap: 0.5em;"><i
+                    class="bi bi-download"></i> Descargar</a>
         </li>
         {% endfor %}
     </ul>
     <script>
-    // Cronómetros en vivo para cada archivo
-    const timers = [
-        {% for archivo in archivos %}{{ archivo.tiempo_restante }}{% if not loop.last %}, {% endif %}{% endfor %}
+
+        const timers = [
+            {% for archivo in archivos %}{ { archivo.tiempo_restante } } {% if not loop.last %}, {% endif %} {% endfor %}
     ];
-    function updateTimers() {
-        for (let i = 0; i < timers.length; i++) {
-            if (timers[i] > 0) {
-                timers[i]--;
-                let h = Math.floor(timers[i] / 3600);
-                let m = Math.floor((timers[i] % 3600) / 60);
-                let s = timers[i] % 60;
-                const el = document.getElementById('timer-' + i);
-                if (el) el.textContent = `${h}h ${m}m ${s}s`;
-            } else {
-                const el = document.getElementById('timer-' + i);
-                if (el) el.textContent = 'Eliminado';
+        function updateTimers() {
+            for (let i = 0; i < timers.length; i++) {
+                if (timers[i] > 0) {
+                    timers[i]--;
+                    let h = Math.floor(timers[i] / 3600);
+                    let m = Math.floor((timers[i] % 3600) / 60);
+                    let s = timers[i] % 60;
+                    const el = document.getElementById('timer-' + i);
+                    if (el) el.textContent = `${h}h ${m}m ${s}s`;
+                } else {
+                    const el = document.getElementById('timer-' + i);
+                    if (el) el.textContent = 'Eliminado';
+                }
             }
         }
-    }
-    setInterval(updateTimers, 1000);
+        setInterval(updateTimers, 1000);
     </script>
     {% else %}
     <p style="text-align: center; color: #888;"><i class="bi bi-emoji-frown"></i> No hay audios descargados aún.
