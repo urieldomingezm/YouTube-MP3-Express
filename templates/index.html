@@ -2,219 +2,25 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Descargar audio de YouTube</title>
-    <link rel="stylesheet" href="/static/taiwan.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        html,
-        body {
-            height: 100%;
-        }
 
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        };
+    </script>
+
+    <style>
         body {
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background: var(--tw-bg, #fff);
-            color: var(--tw-text, #18181b);
-        }
-
-        main.container {
-            flex: 1 0 auto;
-        }
-
-        footer {
-            flex-shrink: 0;
-        }
-
-        .navbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1rem 2rem;
-            background: var(--tw-navbar-bg, #fff);
-            border-radius: 0 0 12px 12px;
-            box-shadow: 0 2px 8px #0001;
-            margin-bottom: 2rem;
-        }
-
-        .navbar-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #0ea5e9;
-            display: flex;
-            align-items: center;
-            gap: 0.5em;
-        }
-
-        .theme-toggle {
-            display: flex;
-            gap: 0.5em;
-            align-items: center;
-        }
-
-        .theme-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #0ea5e9;
-            transition: color 0.2s;
-        }
-
-        .theme-btn.active {
-            color: #0369a1;
-        }
-
-        @media (max-width: 600px) {
-            .navbar {
-                flex-direction: column;
-                gap: 0.5em;
-                padding: 1rem;
-            }
-
-            main.container {
-                padding: 0 0.5rem;
-            }
-        }
-
-        .card {
-            background: var(--tw-card-bg, #fff);
-            color: var(--tw-card-text, #18181b);
-        }
-
-        .btn-primary {
-            background: #0ea5e9;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 0.5em 1.2em;
-            transition: background 0.2s;
-        }
-
-        .btn-primary:hover {
-            background: #0369a1;
-        }
-
-        .alert-success {
-            background: #d1fae5;
-            color: #134e4a;
-            border-radius: 6px;
-            padding: 0.7em 1em;
-        }
-
-        .alert-danger {
-            background: #fee2e2;
-            color: #7f1d1d;
-            border-radius: 6px;
-            padding: 0.7em 1em;
-        }
-
-        .alert-warning {
-            background: #fef9c3;
-            color: #92400e;
-            border-radius: 6px;
-            padding: 0.7em 1em;
-        }
-
-        body[data-theme="dark"] {
-            --tw-bg: #18181b;
-            --tw-text: #f3f4f6;
-            --tw-navbar-bg: #23232a;
-            --tw-card-bg: #23232a;
-            --tw-card-text: #f3f4f6;
-        }
-
-        body[data-theme="dark"] .btn-primary {
-            background: #0ea5e9;
-            color: #fff;
-        }
-
-        body[data-theme="dark"] .btn-primary:hover {
-            background: #0369a1;
-        }
-
-        body[data-theme="dark"] .alert-success {
-            background: #134e4a;
-            color: #d1fae5;
-        }
-
-        body[data-theme="dark"] .alert-danger {
-            background: #7f1d1d;
-            color: #fee2e2;
-        }
-
-        body[data-theme="dark"] .alert-warning {
-            background: #92400e;
-            color: #fef9c3;
-        }
-
-        body[data-theme="dark"] footer {
-            color: #888;
-        }
-
-        .yt-result-card {
-            display: flex;
-            align-items: center;
-            gap: 1em;
-            margin-bottom: 0.7em;
-            background: var(--tw-card-bg, #f9f9f9);
-            padding: 0.7em 1em;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px #0001;
-            transition: box-shadow 0.2s, background 0.2s;
-            cursor: pointer;
-        }
-
-        .yt-result-card:hover {
-            background: #e0f2fe;
-            box-shadow: 0 4px 16px #0ea5e933;
-        }
-
-        .yt-thumb {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            object-fit: cover;
-            box-shadow: 0 2px 8px #0002;
-            border: 2px solid #0ea5e9;
-            background: #fff;
-        }
-
-        .yt-title {
-            font-weight: 600;
-            font-size: 1.08em;
-            color: #0ea5e9;
-            margin-bottom: 0.1em;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
-            max-width: 260px;
-        }
-
-        .yt-meta {
-            font-size: 0.97em;
-            color: #888;
-        }
-
-        .yt-btn {
-            font-size: 1em;
-            padding: 0.35em 1em;
-            border-radius: 6px;
-            background: #0ea5e9;
-            color: #fff;
-            border: none;
-            transition: background 0.2s;
-            cursor: pointer;
-            margin-left: 0.5em;
-        }
-
-        .yt-btn:hover {
-            background: #0369a1;
         }
     </style>
+
     <script>
         function setTheme(theme) {
             if (theme === 'auto') {
@@ -222,22 +28,25 @@
                 applyTheme();
                 return;
             }
-            document.body.setAttribute('data-theme', theme);
+            document.documentElement.classList.remove('dark');
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
             localStorage.setItem('theme', theme);
         }
 
         function getPreferredTheme() {
             const stored = localStorage.getItem('theme');
             if (stored) return stored;
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-            return 'light';
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         }
 
         function applyTheme() {
             const theme = getPreferredTheme();
-            document.body.setAttribute('data-theme', theme);
-            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('theme-' + theme)?.classList.add('active');
+            document.documentElement.classList.toggle('dark', theme === 'dark');
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('text-sky-700'));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${theme}"]`);
+            if (activeBtn) activeBtn.classList.add('text-sky-700');
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -253,43 +62,79 @@
     </script>
 </head>
 
-<body>
-    <header>
-        <nav class="navbar">
-            <span class="navbar-title"><i class="bi bi-music-player"></i> YouTube MP3 Express</span>
-            <div class="theme-toggle">
-                <button class="theme-btn" id="theme-light" data-theme="light" title="Modo claro"><i
-                        class="bi bi-brightness-high"></i></button>
-                <button class="theme-btn" id="theme-dark" data-theme="dark" title="Modo oscuro"><i
-                        class="bi bi-moon-stars"></i></button>
-                <button class="theme-btn" id="theme-auto" data-theme="auto" title="Automático"><i
-                        class="bi bi-circle-half"></i></button>
+<body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
+
+    <!-- NAVBAR -->
+    <header class="bg-white dark:bg-gray-800 shadow-md px-6 py-4 rounded-b-2xl mb-8">
+        <nav class="flex flex-col sm:flex-row justify-between items-center gap-2">
+            <h1 class="text-2xl font-bold text-sky-500 flex items-center gap-2">
+                <!-- Music Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-500" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19V6l12-2v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                YouTube MP3 Express
+            </h1>
+            <div class="flex gap-3 items-center">
+                <!-- LIGHT -->
+                <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="light"
+                    title="Modo claro">
+                    ☀️
+                </button>
+                <!-- DARK -->
+                <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="dark"
+                    title="Modo oscuro">
+                    🌙
+                </button>
+                <!-- AUTO -->
+                <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="auto"
+                    title="Automático">
+                    🌓
+                </button>
             </div>
         </nav>
     </header>
-    <main class="container" style="max-width: 600px; margin-top: 20px;">
 
-        <div class="card" style="padding: 2.5rem 2rem; text-align: center;">
-            <h1 style="font-size: 2.2rem; margin-bottom: 0.5em; color: #0ea5e9; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 0.5em;">Descarga tu música favorita</h1>
-            <p style="margin-bottom: 1.2em; color: var(--tw-text, #555);">Pega la URL de YouTube y obtén el audio en MP3 al instante.</p>
+    <!-- MAIN -->
+    <main class="flex-1 max-w-2xl w-full mx-auto px-4">
+        <div class="bg-white dark:bg-gray-800 text-center rounded-xl shadow p-8">
+            <h2 class="text-3xl font-semibold text-sky-500 mb-2 flex justify-center items-center gap-2">
+                🎵 Descarga tu música favorita
+            </h2>
+            <p class="text-gray-600 dark:text-gray-300 mb-5">
+                Pega la URL de YouTube y obtén el audio en MP3 al instante.
+            </p>
 
+            <!-- PROGRESO -->
             {% include '_progreso.html' %}
+
+            <!-- MENSAJES FLASH -->
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-            <ul class="messages" style="margin-top: 1.5em;">
+            <ul class="mt-6 space-y-3">
                 {% for category, message in messages %}
-                <li class="alert alert-{{ category }}">{{ message }}</li>
+                <li class="
+          px-4 py-3 rounded-md text-sm
+          {% if category == 'success' %}bg-emerald-100 text-emerald-900 dark:bg-emerald-800 dark:text-emerald-100
+          {% elif category == 'danger' %}bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+          {% elif category == 'warning' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100
+          {% endif %}
+        ">
+                    {{ message }}
+                </li>
                 {% endfor %}
             </ul>
             {% endif %}
             {% endwith %}
         </div>
 
+        <!-- DESCARGADOS -->
         {% include '_descargados.html' %}
     </main>
+
+    <!-- FOOTER -->
     {% include '_footer.html' %}
-
-
 </body>
 
 </html>

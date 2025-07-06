@@ -1,10 +1,21 @@
 <header>
-    <nav class="navbar">
-        <span class="navbar-title"><i class="bi bi-music-player"></i> YouTube MP3 Express</span>
-        <div class="theme-toggle">
-            <button class="theme-btn" id="theme-light" data-theme="light" title="Modo claro"><i class="bi bi-brightness-high"></i></button>
-            <button class="theme-btn" id="theme-dark" data-theme="dark" title="Modo oscuro"><i class="bi bi-moon-stars"></i></button>
-            <button class="theme-btn" id="theme-auto" data-theme="auto" title="Automático"><i class="bi bi-circle-half"></i></button>
+    <nav class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 shadow">
+        <span class="flex items-center text-xl font-bold text-gray-800 dark:text-white">
+            <i class="bi bi-music-player mr-2"></i> YouTube MP3 Express
+        </span>
+        <div class="flex items-center space-x-2">
+            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-light" data-theme="light" title="Modo claro">
+                <i class="bi bi-brightness-high"></i>
+            </button>
+            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-dark" data-theme="dark" title="Modo oscuro">
+                <i class="bi bi-moon-stars"></i>
+            </button>
+            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-auto" data-theme="auto" title="Automático">
+                <i class="bi bi-circle-half"></i>
+            </button>
+            <button class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" title="Hacer pedido">
+                Hacer pedido
+            </button>
         </div>
     </nav>
 </header>

@@ -1,50 +1,75 @@
-<form id="descarga-form" method="POST" style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
-    <input type="url" id="url" name="url" required placeholder="Pega aquí la URL de YouTube"
-        style="width: 100%; max-width: 400px;">
-    <button type="submit" class="btn-primary"
-        style="width: 100%; max-width: 200px; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5em;"><i
-            class="bi bi-cloud-arrow-down"></i> Descargar</button>
+
+<form id="descarga-form" method="POST" class="flex flex-col gap-4 items-center">
+  <input
+    type="url"
+    id="url"
+    name="url"
+    required
+    placeholder="Pega aquí la URL de YouTube"
+    class="w-full max-w-md p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500"
+  />
+  <button
+    type="submit"
+    class="w-full max-w-xs text-white bg-sky-500 hover:bg-sky-600 font-medium py-2 px-4 rounded-md flex items-center justify-center gap-2 transition"
+  >
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+      viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M7 16a4 4 0 01-.88-7.906A5.5 5.5 0 0116.9 9H17a4 4 0 010 8h-4m0 0l-3-3m3 3l3-3m-3 3V4" />
+    </svg>
+    Descargar
+  </button>
 </form>
-<div id="progreso-descarga" style="display:none; margin-top:1.5em; width:100%; max-width:400px; margin-left:auto; margin-right:auto;">
-    <div style="display:flex; align-items:center; gap:0.7em; justify-content:center; flex-wrap:wrap;">
-        <i class="bi bi-arrow-repeat bi-spin" style="font-size:1.5em; color:#0ea5e9;"></i>
-        <span id="progreso-texto" style="font-size:1.1em; word-break:break-word;">Iniciando descarga...</span>
-    </div>
-    <div style="background:#e5e7eb; border-radius:8px; height:18px; margin-top:0.7em; width:100%; min-width:120px; max-width:100%;">
-        <div id="progreso-barra" style="background:#0ea5e9; height:100%; width:0%; border-radius:8px; transition:width 0.2s;"></div>
-    </div>
+
+
+<div id="progreso-descarga" class="hidden mt-6 w-full max-w-md mx-auto">
+  <div class="flex items-center justify-center gap-3 flex-wrap">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 animate-spin text-sky-500" fill="none"
+      viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M12 4v1m6.364 1.636l-.707.707M20 12h-1m-1.636 6.364l-.707-.707M12 20v-1m-6.364-1.636l.707-.707M4 12h1m1.636-6.364l.707.707" />
+    </svg>
+    <span id="progreso-texto" class="text-base break-words">Iniciando descarga...</span>
+  </div>
+  <div class="bg-gray-200 rounded-md h-4 mt-3 w-full min-w-[120px]">
+    <div id="progreso-barra" class="bg-sky-500 h-full w-0 rounded-md transition-all duration-200"></div>
+  </div>
 </div>
 
-<script>
 
-const form = document.getElementById('descarga-form');
-const progresoDiv = document.getElementById('progreso-descarga');
-const progresoBarra = document.getElementById('progreso-barra');
-const progresoTexto = document.getElementById('progreso-texto');
-let progresoInterval = null;
-if (form) {
-    form.addEventListener('submit', function() {
-        progresoDiv.style.display = 'block';
-        progresoBarra.style.width = '0%';
-        progresoTexto.textContent = 'Iniciando descarga...';
-        progresoDiv.scrollIntoView({behavior:'smooth', block:'center'});
-        progresoInterval = setInterval(async () => {
-            const resp = await fetch('/progreso');
-            const data = await resp.json();
-            if (data.status === 'downloading') {
-                progresoBarra.style.width = data.progress.toFixed(1) + '%';
-                progresoTexto.textContent = `Descargando... ${data.progress.toFixed(1)}%`;
-            } else if (data.status === 'converting') {
-                progresoBarra.style.width = '100%';
-                progresoTexto.textContent = 'Convirtiendo a MP3...';
-            } else if (data.status === 'finished') {
-                progresoBarra.style.width = '100%';
-                progresoTexto.textContent = '¡Descarga completada!';
-                clearInterval(progresoInterval);
-            } else if (data.status === 'idle') {
-                clearInterval(progresoInterval);
-            }
-        }, 500);
+<script>
+  const form = document.getElementById('descarga-form');
+  const progresoDiv = document.getElementById('progreso-descarga');
+  const progresoBarra = document.getElementById('progreso-barra');
+  const progresoTexto = document.getElementById('progreso-texto');
+  let progresoInterval = null;
+
+  if (form) {
+    form.addEventListener('submit', function () {
+      progresoDiv.classList.remove('hidden');
+      progresoBarra.style.width = '0%';
+      progresoTexto.textContent = 'Iniciando descarga...';
+      progresoDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      progresoInterval = setInterval(async () => {
+        const resp = await fetch('/progreso');
+        const data = await resp.json();
+
+        if (data.status === 'downloading') {
+          progresoBarra.style.width = data.progress.toFixed(1) + '%';
+          progresoTexto.textContent = `Descargando... ${data.progress.toFixed(1)}%`;
+        } else if (data.status === 'converting') {
+          progresoBarra.style.width = '100%';
+          progresoTexto.textContent = 'Convirtiendo a MP3...';
+        } else if (data.status === 'finished') {
+          progresoBarra.style.width = '100%';
+          progresoTexto.textContent = '¡Descarga completada!';
+          clearInterval(progresoInterval);
+        } else if (data.status === 'idle') {
+          clearInterval(progresoInterval);
+        }
+      }, 500);
     });
-}
+  }
 </script>
