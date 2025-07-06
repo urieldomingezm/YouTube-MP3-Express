@@ -3,17 +3,12 @@ import yt_dlp
 import os
 import time
 
-# Para búsqueda de videos en YouTube
 from youtubesearchpython import VideosSearch
-
-# --- Endpoint de búsqueda de videos de YouTube ---
-
 
 app = Flask(__name__)
 app.secret_key = 'descarga-audio'
 
 
-# Usar /tmp en Vercel para archivos temporales
 import platform
 if 'vercel' in os.environ.get('PATH', '').lower() or platform.system() == 'Linux':
     RUTA_DESCARGA = '/tmp/descargar'
@@ -24,7 +19,6 @@ if not os.path.exists(RUTA_DESCARGA):
     os.makedirs(RUTA_DESCARGA)
 
 
-# --- Funciones auxiliares ---
 import re
 from datetime import datetime
 
@@ -35,9 +29,50 @@ def limpiar_url_youtube(url):
     return url
 
 def descargar_audio(url, progress_hook=None):
+    # Extraer metadatos para obtener el artista
+    info = None
+    with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+        try:
+            info = ydl.extract_info(url, download=False)
+        except Exception:
+            info = None
+    artista_abrev = 'Desconocido'
+    if info:
+        import re
+        # 1. Si hay artist, usarlo
+        artista = info.get('artist')
+        if artista:
+            pass
+        else:
+            # 2. Si no, intentar extraer antes del primer guion del título
+            titulo = info.get('title', '')
+            if '-' in titulo:
+                artista = titulo.split('-')[0].strip()
+            else:
+                # 3. Si no, usar uploader
+                artista = info.get('uploader', 'Desconocido')
+        # Limpiar y abreviar
+        artista = artista.lower()
+        artista = re.sub(r'[áàäâ]', 'a', artista)
+        artista = re.sub(r'[éèëê]', 'e', artista)
+        artista = re.sub(r'[íìïî]', 'i', artista)
+        artista = re.sub(r'[óòöô]', 'o', artista)
+        artista = re.sub(r'[úùüû]', 'u', artista)
+        artista = re.sub(r'[^a-z0-9\-\s]', '', artista)
+        artista = re.sub(r'\s+', ' ', artista).strip()
+        palabras = artista.split()
+        if len(palabras) > 2:
+            artista_abrev = ' '.join([p.capitalize() for p in palabras[:2]])
+        else:
+            artista_abrev = ' '.join([p.capitalize() for p in palabras])
+        if not artista_abrev:
+            artista_abrev = 'Desconocido'
+    carpeta_artista = os.path.join(RUTA_DESCARGA, artista_abrev)
+    if not os.path.exists(carpeta_artista):
+        os.makedirs(carpeta_artista)
     ydl_opts = {
         'format': 'bestaudio',
-        'outtmpl': f'{RUTA_DESCARGA}/%(title)s.%(ext)s',
+        'outtmpl': f'{carpeta_artista}/%(title)s.%(ext)s',
         'noplaylist': True,
         'progress_hooks': [progress_hook] if progress_hook else [],
         'postprocessors': [
@@ -51,29 +86,33 @@ def descargar_audio(url, progress_hook=None):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
     # Actualiza la fecha de creación del archivo mp3 a ahora
-    for f in os.listdir(RUTA_DESCARGA):
-        if f.endswith('.mp3'):
-            ruta = os.path.join(RUTA_DESCARGA, f)
-            os.utime(ruta, (time.time(), time.time()))
+    for root, dirs, files in os.walk(RUTA_DESCARGA):
+        for f in files:
+            if f.endswith('.mp3'):
+                ruta = os.path.join(root, f)
+                os.utime(ruta, (time.time(), time.time()))
 
 def obtener_archivos_descargados():
-    """Obtiene la lista de archivos mp3 válidos y elimina los expirados."""
+    """Obtiene la lista de archivos mp3 válidos y elimina los expirados. Agrupa por artista/carpeta."""
     archivos = []
     ahora = time.time()
     LIMITE_SEGUNDOS = 24*60*60  # 1 día
     if os.path.exists(RUTA_DESCARGA):
-        for f in os.listdir(RUTA_DESCARGA):
-            if f.endswith('.mp3'):
-                ruta = os.path.join(RUTA_DESCARGA, f)
-                try:
-                    creado = os.path.getmtime(ruta)
-                except Exception:
-                    creado = ahora
-                tiempo_restante = int(LIMITE_SEGUNDOS - (ahora - creado))
-                if tiempo_restante <= 0:
-                    os.remove(ruta)
-                else:
-                    archivos.append({'nombre': f, 'tiempo_restante': tiempo_restante})
+        for root, dirs, files in os.walk(RUTA_DESCARGA):
+            for f in files:
+                if f.endswith('.mp3'):
+                    ruta = os.path.join(root, f)
+                    try:
+                        creado = os.path.getmtime(ruta)
+                    except Exception:
+                        creado = ahora
+                    tiempo_restante = int(LIMITE_SEGUNDOS - (ahora - creado))
+                    if tiempo_restante <= 0:
+                        os.remove(ruta)
+                    else:
+                        # Mostrar ruta relativa desde RUTA_DESCARGA
+                        rel_path = os.path.relpath(ruta, RUTA_DESCARGA)
+                        archivos.append({'nombre': rel_path, 'tiempo_restante': tiempo_restante})
     return archivos
 
 def actualizar_progreso(d, progress_data):
@@ -114,18 +153,21 @@ def progreso():
     return jsonify(progress_data)
 
 
-@app.route('/descargar/<nombre_archivo>')
+from urllib.parse import unquote
+
+@app.route('/descargar/<path:nombre_archivo>')
 def descargar_archivo(nombre_archivo):
+    # nombre_archivo puede ser "artista/cancion.mp3"
+    nombre_archivo = unquote(nombre_archivo)
     ruta = os.path.join(RUTA_DESCARGA, nombre_archivo)
     if os.path.exists(ruta):
-        return send_file(ruta, as_attachment=True, download_name=nombre_archivo, mimetype='audio/mpeg')
+        return send_file(ruta, as_attachment=True, download_name=os.path.basename(nombre_archivo), mimetype='audio/mpeg')
     flash('Archivo no encontrado.', 'danger')
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-# --- Endpoint de búsqueda de videos de YouTube ---
 @app.route('/buscar')
 def buscar():
     query = request.args.get('q', '')
