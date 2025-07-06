@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descargar audio de YouTube</title>
+    <link rel="stylesheet" href="/static/taiwan.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: var(--tw-bg, #fff);
+            color: var(--tw-text, #18181b);
+        }
+
+        main.container {
+            flex: 1 0 auto;
+        }
+
+        footer {
+            flex-shrink: 0;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 2rem;
+            background: var(--tw-navbar-bg, #fff);
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 2px 8px #0001;
+            margin-bottom: 2rem;
+        }
+
+        .navbar-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0ea5e9;
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        .theme-toggle {
+            display: flex;
+            gap: 0.5em;
+            align-items: center;
+        }
+
+        .theme-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #0ea5e9;
+            transition: color 0.2s;
+        }
+
+        .theme-btn.active {
+            color: #0369a1;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                flex-direction: column;
+                gap: 0.5em;
+                padding: 1rem;
+            }
+
+            main.container {
+                padding: 0 0.5rem;
+            }
+        }
+
+        .card {
+            background: var(--tw-card-bg, #fff);
+            color: var(--tw-card-text, #18181b);
+        }
+
+        .btn-primary {
+            background: #0ea5e9;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5em 1.2em;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #0369a1;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #134e4a;
+            border-radius: 6px;
+            padding: 0.7em 1em;
+        }
+
+        .alert-danger {
+            background: #fee2e2;
+            color: #7f1d1d;
+            border-radius: 6px;
+            padding: 0.7em 1em;
+        }
+
+        .alert-warning {
+            background: #fef9c3;
+            color: #92400e;
+            border-radius: 6px;
+            padding: 0.7em 1em;
+        }
+
+        body[data-theme="dark"] {
+            --tw-bg: #18181b;
+            --tw-text: #f3f4f6;
+            --tw-navbar-bg: #23232a;
+            --tw-card-bg: #23232a;
+            --tw-card-text: #f3f4f6;
+        }
+
+        body[data-theme="dark"] .btn-primary {
+            background: #0ea5e9;
+            color: #fff;
+        }
+
+        body[data-theme="dark"] .btn-primary:hover {
+            background: #0369a1;
+        }
+
+        body[data-theme="dark"] .alert-success {
+            background: #134e4a;
+            color: #d1fae5;
+        }
+
+        body[data-theme="dark"] .alert-danger {
+            background: #7f1d1d;
+            color: #fee2e2;
+        }
+
+        body[data-theme="dark"] .alert-warning {
+            background: #92400e;
+            color: #fef9c3;
+        }
+
+        body[data-theme="dark"] footer {
+            color: #888;
+        }
+
+        .yt-result-card {
+            display: flex;
+            align-items: center;
+            gap: 1em;
+            margin-bottom: 0.7em;
+            background: var(--tw-card-bg, #f9f9f9);
+            padding: 0.7em 1em;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px #0001;
+            transition: box-shadow 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+
+        .yt-result-card:hover {
+            background: #e0f2fe;
+            box-shadow: 0 4px 16px #0ea5e933;
+        }
+
+        .yt-thumb {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 2px 8px #0002;
+            border: 2px solid #0ea5e9;
+            background: #fff;
+        }
+
+        .yt-title {
+            font-weight: 600;
+            font-size: 1.08em;
+            color: #0ea5e9;
+            margin-bottom: 0.1em;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            max-width: 260px;
+        }
+
+        .yt-meta {
+            font-size: 0.97em;
+            color: #888;
+        }
+
+        .yt-btn {
+            font-size: 1em;
+            padding: 0.35em 1em;
+            border-radius: 6px;
+            background: #0ea5e9;
+            color: #fff;
+            border: none;
+            transition: background 0.2s;
+            cursor: pointer;
+            margin-left: 0.5em;
+        }
+
+        .yt-btn:hover {
+            background: #0369a1;
+        }
+    </style>
+    <script>
+        function setTheme(theme) {
+            if (theme === 'auto') {
+                localStorage.removeItem('theme');
+                applyTheme();
+                return;
+            }
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        function getPreferredTheme() {
+            const stored = localStorage.getItem('theme');
+            if (stored) return stored;
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+            return 'light';
+        }
+
+        function applyTheme() {
+            const theme = getPreferredTheme();
+            document.body.setAttribute('data-theme', theme);
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('theme-' + theme)?.classList.add('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            applyTheme();
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const theme = this.dataset.theme;
+                    setTheme(theme);
+                    applyTheme();
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <header>
+        <nav class="navbar">
+            <span class="navbar-title"><i class="bi bi-music-player"></i> YouTube MP3 Express</span>
+            <div class="theme-toggle">
+                <button class="theme-btn" id="theme-light" data-theme="light" title="Modo claro"><i
+                        class="bi bi-brightness-high"></i></button>
+                <button class="theme-btn" id="theme-dark" data-theme="dark" title="Modo oscuro"><i
+                        class="bi bi-moon-stars"></i></button>
+                <button class="theme-btn" id="theme-auto" data-theme="auto" title="Automático"><i
+                        class="bi bi-circle-half"></i></button>
+            </div>
+        </nav>
+    </header>
+    <main class="container" style="max-width: 600px; margin-top: 20px;">
+
+        <div class="card" style="padding: 2.5rem 2rem; text-align: center;">
+            <h1 style="font-size: 2.2rem; margin-bottom: 0.5em; color: #0ea5e9; letter-spacing: 1px; display: flex; align-items: center; justify-content: center; gap: 0.5em;">Descarga tu música favorita</h1>
+            <p style="margin-bottom: 1.2em; color: var(--tw-text, #555);">Pega la URL de YouTube y obtén el audio en MP3 al instante.</p>
+
+            {% include '_progreso.html' %}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <ul class="messages" style="margin-top: 1.5em;">
+                {% for category, message in messages %}
+                <li class="alert alert-{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        {% include '_descargados.html' %}
+    </main>
+    {% include '_footer.html' %}
+
+
+</body>
+
+</html>

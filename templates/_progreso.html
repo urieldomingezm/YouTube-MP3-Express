@@ -1,0 +1,49 @@
+<form id="descarga-form" method="POST" style="display: flex; flex-direction: column; gap: 1rem; align-items: center;">
+    <input type="url" id="url" name="url" required placeholder="Pega aquí la URL de YouTube"
+        style="width: 100%; max-width: 400px;">
+    <button type="submit" class="btn-primary"
+        style="width: 100%; max-width: 200px; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5em;"><i
+            class="bi bi-cloud-arrow-down"></i> Descargar</button>
+</form>
+<div id="progreso-descarga" style="display:none; margin-top:1.5em; width:100%; max-width:400px; margin-left:auto; margin-right:auto;">
+    <div style="display:flex; align-items:center; gap:0.7em; justify-content:center; flex-wrap:wrap;">
+        <i class="bi bi-arrow-repeat bi-spin" style="font-size:1.5em; color:#0ea5e9;"></i>
+        <span id="progreso-texto" style="font-size:1.1em; word-break:break-word;">Iniciando descarga...</span>
+    </div>
+    <div style="background:#e5e7eb; border-radius:8px; height:18px; margin-top:0.7em; width:100%; min-width:120px; max-width:100%;">
+        <div id="progreso-barra" style="background:#0ea5e9; height:100%; width:0%; border-radius:8px; transition:width 0.2s;"></div>
+    </div>
+</div>
+<script>
+// Manejo de progreso de descarga
+const form = document.getElementById('descarga-form');
+const progresoDiv = document.getElementById('progreso-descarga');
+const progresoBarra = document.getElementById('progreso-barra');
+const progresoTexto = document.getElementById('progreso-texto');
+let progresoInterval = null;
+if (form) {
+    form.addEventListener('submit', function() {
+        progresoDiv.style.display = 'block';
+        progresoBarra.style.width = '0%';
+        progresoTexto.textContent = 'Iniciando descarga...';
+        progresoDiv.scrollIntoView({behavior:'smooth', block:'center'});
+        progresoInterval = setInterval(async () => {
+            const resp = await fetch('/progreso');
+            const data = await resp.json();
+            if (data.status === 'downloading') {
+                progresoBarra.style.width = data.progress.toFixed(1) + '%';
+                progresoTexto.textContent = `Descargando... ${data.progress.toFixed(1)}%`;
+            } else if (data.status === 'converting') {
+                progresoBarra.style.width = '100%';
+                progresoTexto.textContent = 'Convirtiendo a MP3...';
+            } else if (data.status === 'finished') {
+                progresoBarra.style.width = '100%';
+                progresoTexto.textContent = '¡Descarga completada!';
+                clearInterval(progresoInterval);
+            } else if (data.status === 'idle') {
+                clearInterval(progresoInterval);
+            }
+        }, 500);
+    });
+}
+</script>
