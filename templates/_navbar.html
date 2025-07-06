@@ -1,21 +1,182 @@
-<header>
-    <nav class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-900 shadow">
-        <span class="flex items-center text-xl font-bold text-gray-800 dark:text-white">
-            <i class="bi bi-music-player mr-2"></i> YouTube MP3 Express
-        </span>
-        <div class="flex items-center space-x-2">
-            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-light" data-theme="light" title="Modo claro">
-                <i class="bi bi-brightness-high"></i>
+<header class="bg-white dark:bg-gray-800 shadow-md px-6 py-4 rounded-b-2xl mb-8">
+    <nav class="container mx-auto">
+        <div class="flex justify-between items-center">
+            <!-- Logo and Title -->
+            <h1 class="text-2xl font-bold text-sky-500 flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-sky-500" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 19V6l12-2v13M9 19a2 2 0 11-4 0 2 2 0 014 0zm12-2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                YouTube MP3 Express
+            </h1>
+
+            <!-- Mobile Menu Button -->
+            <button id="mobile-menu-button" class="md:hidden text-sky-500 hover:text-sky-700"
+                onclick="toggleMobileMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
             </button>
-            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-dark" data-theme="dark" title="Modo oscuro">
-                <i class="bi bi-moon-stars"></i>
-            </button>
-            <button class="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700" id="theme-auto" data-theme="auto" title="Automático">
-                <i class="bi bi-circle-half"></i>
-            </button>
-            <button class="ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition" title="Hacer pedido">
-                Hacer pedido
-            </button>
+
+            <!-- Desktop Navigation -->
+            <div class="hidden md:flex items-center gap-4">
+                <!-- Theme Toggles -->
+                <div class="flex gap-3 items-center">
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="light"
+                        title="Modo claro">
+                        ☀️
+                    </button>
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="dark"
+                        title="Modo oscuro">
+                        🌙
+                    </button>
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="auto"
+                        title="Automático">
+                        🌓
+                    </button>
+                </div>
+                <!-- Order Button -->
+                <a href="/order"
+                    class="inline-flex items-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Hacer Pedido
+                </a>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4">
+            <div class="flex flex-col gap-4">
+                <!-- Theme Toggles -->
+                <div class="flex justify-center gap-3">
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="light"
+                        title="Modo claro">
+                        ☀️
+                    </button>
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="dark"
+                        title="Modo oscuro">
+                        🌙
+                    </button>
+                    <button class="theme-btn text-xl text-sky-500 hover:text-sky-700 transition" data-theme="auto"
+                        title="Automático">
+                        🌓
+                    </button>
+                </div>
+                <!-- Order Button -->
+                <button onclick="document.getElementById('order-modal').classList.remove('hidden')"
+                    class="flex items-center justify-center gap-2 px-4 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Hacer Pedido
+                </button>
+            </div>
         </div>
     </nav>
 </header>
+
+<script>
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobile-menu');
+        menu.classList.toggle('hidden');
+    }
+</script>
+
+<!-- Modal -->
+<div id="order-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-sky-500">Hacer Pedido</h3>
+            <button onclick="document.getElementById('order-modal').classList.add('hidden')"
+                class="text-gray-500 hover:text-gray-700">
+                ✕
+            </button>
+        </div>
+        <form class="space-y-4" onsubmit="handleSubmit(event)">
+            <div>
+                <label class="block text-gray-700 dark:text-gray-300 mb-2" for="music-type">
+                    Tipo de Música
+                </label>
+                <select id="music-type"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white">
+                    <option value="">Selecciona un género</option>
+                    <option value="pop">Pop</option>
+                    <option value="rock">Rock</option>
+                    <option value="jazz">Jazz</option>
+                    <option value="classical">Clásica</option>
+                    <option value="electronic">Electrónica</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-gray-700 dark:text-gray-300 mb-2" for="artist">
+                    Artista
+                </label>
+                <input type="text" id="artist"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                    placeholder="Nombre del artista">
+            </div>
+
+            <div>
+                <label class="block text-gray-700 dark:text-gray-300 mb-2" for="song-title">
+                    Título de la Canción
+                </label>
+                <input type="text" id="song-title"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700 dark:text-white"
+                    placeholder="Nombre de la canción">
+            </div>
+
+            <div class="flex justify-end gap-3 mt-6">
+                <button onclick="document.getElementById('order-modal').classList.add('hidden')" type="button"
+                    class="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+                    Cancelar
+                </button>
+                <button type="submit" class="px-4 py-2 bg-sky-500 text-white rounded hover:bg-sky-600 transition">
+                    Enviar Pedido
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function handleSubmit(event) {
+        event.preventDefault();
+
+        const musicType = document.getElementById('music-type').value;
+        const artist = document.getElementById('artist').value;
+        const songTitle = document.getElementById('song-title').value;
+
+        if (!musicType || !artist || !songTitle) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Por favor completa todos los campos'
+            });
+            return;
+        }
+
+        // Hide modal
+        document.getElementById('order-modal').classList.add('hidden');
+
+        // Show success message
+        Swal.fire({
+            icon: 'success',
+            title: '¡Pedido Enviado!',
+            text: 'Tu pedido ha sido recibido correctamente',
+            showConfirmButton: false,
+            timer: 2000
+        });
+
+        // Reset form
+        event.target.reset();
+    }
+</script>
